@@ -31,7 +31,8 @@ public class Orderer
     foreach (var parent in parentElements)
     {
       var orderedChildren = parent
-        .Elements(_orderElementName)
+        .Elements()
+        .Where(e => e.Name.LocalName == _orderElementName)
         .OrderBy(e => (string?)e.Attribute(_orderByAttribute), StringComparer.Ordinal)
         .ToList();
 
@@ -42,7 +43,10 @@ public class Orderer
       var updatedNodes = parent.Nodes().Select(node =>
       {
         if (node is XElement element && element.Name.LocalName == _orderElementName)
-          return orderedChildren[orderedChildIndex++];
+        {
+          Console.WriteLine($"Ordering element: <{_orderElementName} {_orderByAttribute}=\"{element.Attribute(_orderByAttribute)?.Value}\"> => <{_orderElementName} {_orderByAttribute}=\"{orderedChildren[orderedChildIndex].Attribute(_orderByAttribute)?.Value}\">");
+          return orderedChildren[orderedChildIndex++]; 
+        }
 
         return node;
       });
@@ -66,18 +70,15 @@ public class Orderer
     if (document.Root == null)
       return Enumerable.Empty<XElement>();
 
-    if (string.IsNullOrWhiteSpace(orderParent))
-      return [document.Root];
-
     var pathParts = orderParent
       .Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    if (document.Root.Name.LocalName == pathParts.FirstOrDefault())
+      pathParts = pathParts.Skip(1).ToArray();
 
     IEnumerable<XElement> current = [document.Root];
-
     foreach (var part in pathParts)
     {
-      current = current.SelectMany(element =>
-        element.Elements().Where(child => child.Name.LocalName == part));
+      current = current.SelectMany(e => e.Elements().Where(child => child.Name.LocalName == part));
     }
 
     return current;
