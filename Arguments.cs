@@ -30,7 +30,7 @@ public class Arguments
       Description = "The element to order, specified in the format <orderElement>[<orderByAttribute>]. For example: 'Root/Item[Name]'."
     };
     rootCommand.Arguments.Add(orderElementArgument);
-    
+
     Argument<FileInfo> outputFilePathArgument = new("output")
     {
       Arity = ArgumentArity.ZeroOrOne,
@@ -60,22 +60,25 @@ public class Arguments
       string orderElement = result.GetRequiredValue<string>("order");
       string outputFilePath = result.GetValue<FileInfo>("output")?.FullName ?? inputFilePath;
 
-      ParseOrderElement(orderElement, out string orderParent, out string orderElementName, out string orderByAttribute);
-      onArgumentsParsed(inputFilePath, outputFilePath, orderParent, orderElementName, orderByAttribute);
+      ParseOrderElement(orderElement, out OrderInfo[] orderInfo);
+      onArgumentsParsed(inputFilePath, outputFilePath, orderInfo);
     });
   }
 
-  private void ParseOrderElement(string orderElement, out string orderParent, out string orderElementName, out string orderByAttribute)
+  private void ParseOrderElement(string orderElement, out OrderInfo[] orderInfo)
   {
-    var parts = orderElement.Split('[', ']');
-    if (parts.Length != 3)
-      throw new ArgumentException("Order element must have the format <orderElement>[<orderByAttribute>].");
+    orderInfo = orderElement.Split(',', StringSplitOptions.RemoveEmptyEntries)
+      .Select(el =>
+      {
+        var parts = el.Split('[', ']');
+        if (parts.Length != 3)
+          throw new ArgumentException("Order element must have the format <orderElement>[<orderByAttribute>].");
 
-    var pathParts = parts[0].Split('/');
-    orderParent = string.Join("/", pathParts.Take(pathParts.Length - 1));
-    orderElementName = pathParts.Last();
-    orderByAttribute = parts[1];
+        var pathParts = parts[0].Split('/');
+        return new OrderInfo(string.Join("/", pathParts.Take(pathParts.Length - 1)), pathParts.Last(), parts[1]);
+      })
+      .ToArray();
   }
 
-  public delegate void OnArgumentsParsed(string inputFilePath, string outputFilePath, string orderParent, string orderElementName, string orderByAttribute);
+  public delegate void OnArgumentsParsed(string inputFilePath, string outputFilePath, OrderInfo[] orderInfo);
 }

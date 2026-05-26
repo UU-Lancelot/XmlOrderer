@@ -14,4 +14,18 @@
       <B Name="XA">14</B>
     </A>
   </C>
+  <D>
+    <A>
+      <B Name="A">1</B>
+      <B Name="B">2</B>
+      <B Name="XA">3</B>
+      <B Name="AA">4</B>
+    </A>
+    <A>
+      <B Name="A">11</B>
+      <B Name="CA">12</B>
+      <B Name="B">13</B>
+      <B Name="XA">14</B>
+    </A>
+  </D>
 </Test>

@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/bin/Debug/net10.0/XmlOrderer.dll",
-            "args": ["./test.xml", "C/A/B[Name]", "./out.xml"],
+            "args": ["./test.xml", "Test/C/A/B[Name],Test/D/A/B[Name]", "./out.xml"],
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "stopAtEntry": false
