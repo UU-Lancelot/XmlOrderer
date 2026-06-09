@@ -6,6 +6,7 @@
     <!-- <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier> -->
+    <Version>1.0.1</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>UU.Lancelot.XmlOrderer</RootNamespace>

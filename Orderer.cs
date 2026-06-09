@@ -50,7 +50,7 @@ public class Orderer
         var orderedChildren = parent
           .Elements()
           .Where(e => e.Name.LocalName == info.OrderElementName)
-          .OrderBy(e => (string?)e.Attribute(info.OrderByAttribute))
+          .OrderBy(e => (string?)e.Attribute(info.OrderByAttribute), StringComparer.InvariantCulture)
           .ToList();
 
         if (orderedChildren.Count < 2)

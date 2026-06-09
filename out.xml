@@ -3,9 +3,12 @@
   <C>
     <A>
       <B Name="A">1</B>
-      <B Name="AA">4</B>
+      <B Name="AA">7</B>
       <B Name="B">2</B>
-      <B Name="XA">3</B>
+      <B Name="C">3</B>
+      <B Name="Ch">5</B>
+      <B Name="D">4</B>
+      <B Name="XA">6</B>
     </A>
     <A>
       <B Name="A">11</B>
