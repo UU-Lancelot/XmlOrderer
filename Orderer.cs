@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -5,12 +6,14 @@ namespace UU.Lancelot.XmlOrderer;
 
 public class Orderer
 {
-  public static void Order(string loadFilePath, string saveFilePath, IEnumerable<OrderInfo> orderInfo)
+  public static void Order(string loadFilePath, string saveFilePath, IEnumerable<OrderInfo> orderInfo, bool normalizeHql)
   {
     var orderer = new Orderer(orderInfo);
 
     XDocument document = orderer.LoadDocument(loadFilePath);
     orderer.Order(ref document);
+    if (normalizeHql)
+      orderer.NormalizeHql(document);
     orderer.SaveDocument(document, saveFilePath);
   }
 
@@ -74,6 +77,31 @@ public class Orderer
       }
     }
   }
+
+  public void NormalizeHql(XDocument document)
+  {
+    var textNodes = document
+      .DescendantNodes()
+      .OfType<XText>()
+      .Where(text => SqlStartRegex.IsMatch(text.Value))
+      .ToList();
+
+    foreach (var text in textNodes)
+    {
+      string normalized = WhitespaceRegex.Replace(text.Value, " ").Trim();
+      if (normalized == text.Value)
+        continue;
+
+      Console.WriteLine($"Normalizing HQL in element: <{text.Parent?.Name.LocalName}>");
+      text.Value = normalized;
+    }
+  }
+
+  private static readonly Regex SqlStartRegex = new(
+    @"^\s*(hql\s*;\s*)?select\s+\S.*?\s+from\s+[\w\[\]""`.]+",
+    RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
+
+  private static readonly Regex WhitespaceRegex = new(@"\s+");
 
   private static IEnumerable<XElement> FindParentElements(XDocument document, string orderParent)
   {

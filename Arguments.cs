@@ -37,6 +37,12 @@ public class Arguments
       Description = "The path to the output XML file. If not provided, the input file will be overwritten."
     };
     rootCommand.Arguments.Add(outputFilePathArgument);
+
+    Option<bool> normalizeHqlOption = new("--normalize-hql")
+    {
+      Description = "Normalizes SQL/HQL values inside elements: all whitespace is replaced with single spaces and leading/trailing whitespace is removed."
+    };
+    rootCommand.Options.Add(normalizeHqlOption);
   }
 
   public Arguments(RootCommand rootCommand)
@@ -59,9 +65,10 @@ public class Arguments
       string inputFilePath = result.GetRequiredValue<FileInfo>("input").FullName;
       string orderElement = result.GetRequiredValue<string>("order");
       string outputFilePath = result.GetValue<FileInfo>("output")?.FullName ?? inputFilePath;
+      bool normalizeHql = result.GetValue<bool>("--normalize-hql");
 
       ParseOrderElement(orderElement, out OrderInfo[] orderInfo);
-      onArgumentsParsed(inputFilePath, outputFilePath, orderInfo);
+      onArgumentsParsed(inputFilePath, outputFilePath, orderInfo, normalizeHql);
     });
   }
 
@@ -80,5 +87,5 @@ public class Arguments
       .ToArray();
   }
 
-  public delegate void OnArgumentsParsed(string inputFilePath, string outputFilePath, OrderInfo[] orderInfo);
+  public delegate void OnArgumentsParsed(string inputFilePath, string outputFilePath, OrderInfo[] orderInfo, bool normalizeHql);
 }
